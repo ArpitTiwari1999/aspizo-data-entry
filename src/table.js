@@ -22,12 +22,15 @@ function Table(props) {
     const getAxels = (CLASS) => {
         const getClass = parseInt(CLASS);
         if( (parseInt(getClass) > 0 && parseInt(getClass) < 5) || (parseInt(getClass) > 5 && parseInt(getClass) < 10) || (parseInt(getClass) > 12 && parseInt(getClass) < 15) ) return '2';
-        else if (parseInt(getClass) == 5 || parseInt(getClass) == 10) return '3';
-        else if (parseInt(getClass) == 11) return '4';
-        else if (parseInt(getClass) == 12 ) return '13';
+        else if (parseInt(getClass) === 5 || parseInt(getClass) === 10) return '3';
+        else if (parseInt(getClass) === 11) return '4';
+        else if (parseInt(getClass) === 12 ) return '13';
         else return '';
     }
-    const getAvgNumber = (min, max) => parseInt(min + (Math.random() * max));
+    const getAvgNumber = (min, max) => {
+        const avgNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+        return avgNumber;
+    };
     const getSpeed = (CLASS) => {
         const getClass = parseInt(CLASS);
         if(parseInt(getClass) === 1 ) return getAvgNumber(5,25);
@@ -55,17 +58,21 @@ function Table(props) {
             let newData = [...props.data];
             if(newData.length) {
                 const newElem = {ID: parseInt(newData[newData.length-1].ID) + 1, CLASS: sampleClass};
-                newElem.AXELS = getAxels(sampleClass) ;
-                newElem.TIME = props.timer.slice(0,8);
+                newElem.AXELS = getAxels(sampleClass);
+                const newTimer = props.timer.split(':');
+                newElem.TIME = newTimer[0]+':'+newTimer[1]+':'+newTimer[2];
                 newElem.DATE = sampleDate;
                 newElem.SPEED = getSpeed(sampleClass);
                 props.setData([...newData, newElem]);
             }
             else {
-                props.setData([{ ID: '1', CLASS: sampleClass, AXELS: getAxels(sampleClass), TIME: props.timer.slice(0,8), DATE: sampleDate, SPEED: getSpeed(sampleClass) }]);
+                const newTimer = props.timer.split(':');
+                props.setData([{ ID: '1', CLASS: sampleClass, AXELS: getAxels(sampleClass), TIME: newTimer[0]+':'+newTimer[1]+':'+newTimer[2], DATE: sampleDate, SPEED: getSpeed(sampleClass) }]);
             }
             setSampleClass('');
         }
+        else if(event.keyCode == 37) props.updateSeekPosition('left');
+        else if(event.keyCode == 39) props.updateSeekPosition('right');
         else if(event.keyCode == 32){
             (props.timer !== "") && props.setStatus((props.status === 'pause') ? 'play' : 'pause');
         }
@@ -76,11 +83,11 @@ function Table(props) {
            return (
               <tr key={ID}>
                  <td style={{width: '4.5vh'}}>{ID}</td>
-                 <td><input tye="text" style={{width: '10.5vh'}} value={DATE} onChange={(event) => dataUpdate(event, ID, 'DATE')} /></td>
-                 <td><input tye="text" style={{width: '5vh'}} value={CLASS} onChange={(event) => dataUpdate(event, ID, 'CLASS')} /></td>
-                 <td><input tye="text" style={{width: '11.5vh'}} value={TIME} onChange={(event) => dataUpdate(event, ID, 'TIME')} /></td>
-                 <td><input tye="text" style={{width: '5vh'}} value={AXELS} onChange={(event) => dataUpdate(event, ID, 'AXELS')} /></td>
-                 <td><input tye="text" style={{width: '5vh'}} value={SPEED} onChange={(event) => dataUpdate(event, ID, 'SPEED')} /></td>
+                 <td><input type="text" style={{width: '10.5vh'}} value={DATE} onChange={(event) => dataUpdate(event, ID, 'DATE')} /></td>
+                 <td><input type="number" style={{width: '5vh'}} value={CLASS} onChange={(event) => dataUpdate(event, ID, 'CLASS')} /></td>
+                 <td><input type="text" style={{width: '11.5vh'}} value={TIME} onChange={(event) => dataUpdate(event, ID, 'TIME')} /></td>
+                 <td><input type="text" style={{width: '5vh'}} value={AXELS} onChange={(event) => dataUpdate(event, ID, 'AXELS')} /></td>
+                 <td><input type="text" style={{width: '5vh'}} value={SPEED} onChange={(event) => dataUpdate(event, ID, 'SPEED')} /></td>
               </tr>
            )
         })
@@ -89,11 +96,11 @@ function Table(props) {
         return (
             <tr>
                <td style={{width: '4.5vh'}}>[*]</td>
-               <td><input tye="text" style={{width: '10.5vh'}} value={sampleDate} onChange={(event) => setSampleDate(event.target.value)} /></td>
-               <td><input tye="text" style={{width: '5vh'}} value={sampleClass} onKeyDown={onKeyPressed} onChange={(event) => (props.timer !== "") && (event.target.value.slice(-1) !== " ") && setSampleClass(event.target.value)} /></td>
-               <td><input tye="text" style={{width: '11.5vh'}} value='*' /></td>
-               <td><input tye="text" style={{width: '5vh'}} value={sampleAxels} onChange={(event) => setSampleAxels(event.target.value)} /></td>
-               <td><input tye="text" style={{width: '5vh'}} value={sampleSpeed} onChange={(event) => setSampleSpeed(event.target.value)} /></td>
+               <td><input type="text" style={{width: '10.5vh'}} value={sampleDate} onChange={(event) => setSampleDate(event.target.value)} /></td>
+               <td><input type="number" style={{width: '5vh'}} value={sampleClass} onKeyDown={onKeyPressed} onChange={(event) => (props.timer !== "") && (event.target.value.slice(-1) !== " ") && setSampleClass(event.target.value)} /></td>
+               <td><input type="text" style={{width: '11.5vh'}} defaultValue='*' /></td>
+               <td><input type="text" style={{width: '5vh'}} defaultValue='*' /></td>
+               <td><input type="text" style={{width: '5vh'}} defaultValue='*' /></td>
             </tr>
         )
     }

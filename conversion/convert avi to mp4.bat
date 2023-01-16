@@ -1,0 +1,2 @@
+:: for i in *.avi; do ffmpeg -i "$i" "converted_AVI_to_MP4/${i%.*}.mp4"; done
+FOR /F "tokens=*" %%G IN ('dir /b *.avi') DO "ffmpeg.exe" -hide_banner -i "%%G" -threads 8 -acodec mp3 -b:a 128k -ac 2 -strict -2 -c:v libx264 -crf 23 -filter:v "scale=1280:-2,unsharp=5:5:1.0:5:5:0.0" -sws_flags lanczos -b:v 1024k -profile:v main -preset medium -tune film -async 1 -vsync 1 "converted_AVI_to_MP4/%%~nG.mp4"
