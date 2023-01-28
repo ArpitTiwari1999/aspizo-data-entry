@@ -15,8 +15,11 @@ const AlertModal = ({ modalContent, setModalContent }) => {
         {modalContent.body}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={handleClose}>
-          Ohh Yeah !!!
+        <Button variant="secondary" onClick={handleClose}>
+          Close
+        </Button>
+        <Button variant="primary" onClick={modalContent.onFooterClick}>
+          {modalContent.footer}
         </Button>
       </Modal.Footer>
     </Modal>

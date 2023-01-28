@@ -3,8 +3,8 @@ import React, { useEffect, useState, useRef } from "react";
 import ReactPlayer from "react-player";
 import Table from './table';
 import Login from './Login';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faPause, faForward, faBackward, faAngleDoubleRight, faAngleDoubleLeft, faPlus, faMinus, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay, faPause, faForward, faBackward, faAngleDoubleRight, faAngleDoubleLeft, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { CSVLink } from "react-csv";
 import CSVNameModal from './CSVNameModal';
 import Button from 'react-bootstrap/Button';
@@ -66,12 +66,10 @@ function App() {
     }, parseInt(1000/playBackSpeed));
     return () => clearInterval(runInterval);
   }, [status]);
-  // useEffect(()=>{
-  //   const storageData = localStorage.getItem('aspizo-data');
-  //   console.log('storageData');
-  //   console.log(storageData.map(dummyData => dummyData.string()));
-  //   if(storageData) setData(storageData);
-  // },[]);
+  useEffect(()=>{
+    const storageData = JSON.parse(localStorage.getItem('aspizo-data'));
+    if(storageData) setData(storageData);
+  },[]);
   const updatePlayBackSpeed = (up) => {
     if(up){
       if(playBackSpeed > 1.95) setPlayBackSpeed(playBackSpeed*2);
@@ -124,13 +122,39 @@ function App() {
     (shouldIncrease) ? updateTimer(1) : updateTimer(-1);
   }
   const handleSave = () => {
-    // console.log(data);
-    // localStorage.setItem('aspizo-data', data);
-    // setModalContent({
-    //   enable: true,
-    //   title: "Data Saved Successfully!!!",
-    //   body: "Data Saved Successfully!!!"
-    // });
+    localStorage.setItem('aspizo-data', JSON.stringify(data));
+    setModalContent({
+      enable: true,
+      title: "Data Save Confirmation",
+      body: "Are you sure you want to Save All the Records",
+      footer: "Ohh yeah !!!",
+      onFooterClick: () => setModalContent({...modalContent, enable: false})
+    });
+  }
+  const handleDeleteAll = () => {
+    setModalContent({
+      enable: true,
+      title: "Data Delete Confirmation",
+      body: "Are you sure you want to delete all the records",
+      footer: "Delete All",
+      onFooterClick: () => {
+        localStorage.removeItem('aspizo-data');
+        setModalContent({...modalContent, enable: false});
+        setData([]);
+      }
+    });
+  }
+  const handleRowDelete = (index) => {
+    setModalContent({
+      enable: true,
+      title: "Data Delete Confirmation",
+      body: `Are you sure you want to delete Record No. : ${index}`,
+      footer: "Delete",
+      onFooterClick: () => {
+        setData(data.filter((item) => item.ID !== index));
+        setModalContent({...modalContent, enable: false});
+      }
+    });
   }
   return (
     <div className="App">
@@ -147,7 +171,8 @@ function App() {
                 Lane : <input type="text" style={{ width: '5.5vh', height: '4vh', marginLeft: '1vh' }} value={lane} onChange={(event) => setLane(event.target.value)} />
               </span>
             </span>
-            <Table updatePlayBackSpeed={updatePlayBackSpeed} updateBuffer={updateBuffer} timer={videoTimer} videoRef={videoRef} setTimer={setTimer} data={data} setData={setData} setStatus={setStatus} status={status} updateSeekPosition={updateSeekPosition} />
+            <Table handleRowDelete={handleRowDelete} updatePlayBackSpeed={updatePlayBackSpeed} updateBuffer={updateBuffer} timer={videoTimer} videoRef={videoRef} setTimer={setTimer} data={data} setData={setData} setStatus={setStatus} status={status} updateSeekPosition={updateSeekPosition} />
+            <Button variant="secondary" style={{ display: 'flex', marginTop: '1rem' }} onClick={handleDeleteAll}>Delete All</Button>
             {/* <FontAwesomeIcon style={{}} onClick={() => console.log(false)} icon={faFloppyDisk} /> */}
           </div>
           <div>
