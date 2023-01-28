@@ -23,7 +23,7 @@ const CSVNameModal = ({ filename, setFilename, setShowModal, showModal, data, sa
         </Button>
         {/* <Button variant="primary">
           Save */}
-          <CSVLink filename={tempFilename} data={data.map((entry) => ({
+          <CSVLink filename={tempFilename+'.xlsx'} data={data.map((entry) => ({
             'Txn. Id': entry.ID,
             "Survey id": surveyId,
             "Date(format: dd-mm-yyy)": sampleDate,
