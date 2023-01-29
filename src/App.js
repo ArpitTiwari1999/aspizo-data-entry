@@ -68,7 +68,7 @@ function App() {
   }, [status]);
   useEffect(()=>{
     const storageData = JSON.parse(localStorage.getItem('aspizo-data'));
-    if(storageData) setData(storageData);
+    if(storageData) setData(storageData.map((item) => ({...item, axelRef: null})));
   },[]);
   const updatePlayBackSpeed = (up) => {
     if(up){
@@ -122,7 +122,13 @@ function App() {
     (shouldIncrease) ? updateTimer(1) : updateTimer(-1);
   }
   const handleSave = () => {
-    localStorage.setItem('aspizo-data', JSON.stringify(data));
+    localStorage.setItem('aspizo-data', JSON.stringify(data.map((item) => ({
+      AXELS: item.AXELS,
+      CLASS: item.CLASS,
+      ID: item.ID,
+      SPEED: item.SPEED,
+      TIME: item.TIME
+    }))));
     setModalContent({
       enable: true,
       title: "Data Save Confirmation",
@@ -163,13 +169,13 @@ function App() {
       {/* {loggedIn ?  (<> */}
       <div><h1>Aspizo Data Entry Software</h1></div>
         <div className="App-body">
-          <div>
+          <div style={{ width: '38%' }}>
             <span style={{ display: 'flex', alignItems: 'center' }}>
               Date : <input type="text" style={{ width: '19.5vh', height: '4vh', marginRight: '15vh', marginLeft: '1vh' }} value={sampleDate} onChange={(event) => setSampleDate(event.target.value)} />
               <h3>Entry Area</h3>
-              <span style={{ display: 'flex', marginLeft: '13vh' }}>
+              {/* <span style={{ display: 'flex', marginLeft: '13vh' }}>
                 Lane : <input type="text" style={{ width: '5.5vh', height: '4vh', marginLeft: '1vh' }} value={lane} onChange={(event) => setLane(event.target.value)} />
-              </span>
+              </span> */}
             </span>
             <Table handleRowDelete={handleRowDelete} updatePlayBackSpeed={updatePlayBackSpeed} updateBuffer={updateBuffer} timer={videoTimer} videoRef={videoRef} setTimer={setTimer} data={data} setData={setData} setStatus={setStatus} status={status} updateSeekPosition={updateSeekPosition} />
             <Button variant="secondary" style={{ display: 'flex', marginTop: '1rem' }} onClick={handleDeleteAll}>Delete All</Button>
@@ -177,6 +183,11 @@ function App() {
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '.5rem' }}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ display: 'flex', marginLeft: '13vh' }}>
+                  Lane : <input type="text" style={{ width: '5.5vh', height: '4vh', marginLeft: '1vh', marginRight: '2vh' }} value={lane} onChange={(event) => setLane(event.target.value)} />
+                </span>
+              </span>
               <span style={{ display: 'flex' }}>
                 Survey ID : <input type="text" style={{ width: '5.5vh', height: '4vh', marginRight: '7vh', marginLeft: '1vh' }} value={surveyId} onChange={(event) => setSurveyId(event.target.value)} />
               </span>
@@ -207,8 +218,8 @@ function App() {
                 src: videoFilePath,
                 type: 'video/asf'}]} width="100%" height="100%" /> */}
             </div>
-            <ReactPlayer ref={(playerRef) => setVideoRef(playerRef)} controls playing={status === 'play'} playbackRate={playBackSpeed*videoIntervalTimer} style={{maxHeight: '60vh', height: 'fit-content !important', marginBottom: '1rem'}} url={videoFilePath} width="100%" height="100%" />
-            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+            <ReactPlayer className="react-player" ref={(playerRef) => setVideoRef(playerRef)} controls playing={status === 'play'} playbackRate={playBackSpeed*videoIntervalTimer} style={{maxHeight: '60vh', height: 'fit-content !important', marginBottom: '5rem'}} url={videoFilePath} width="100%" height="auto" />
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '85%'}}>
               <FontAwesomeIcon style={{marginRight: '1vh'}} onClick={() => updateOnlyVideoTimerSpeed(false)} icon={faBackward} />
               <p style={{margin: 0}} >&nbsp;{videoIntervalTimer}x&nbsp;</p>
               <FontAwesomeIcon style={{marginLeft: '1vh', marginRight: '65vh'}} onClick={() => updateOnlyVideoTimerSpeed(true)} icon={faForward} />
@@ -216,6 +227,7 @@ function App() {
               <Button variant="primary" onClick={handleSave}>Save</Button>
               <img src='./csv.png' style={{width: '50px'}} alt='Download as CSV' onClick={()=> setShowModal(true)}/>
             </div>
+            <div className="footer"><p>Build v1.4.0</p></div>
           </div>
         </div>
       {/* </>) : <Login setLoggedIn={setLoggedIn} />} */}
