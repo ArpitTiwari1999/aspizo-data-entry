@@ -27,6 +27,7 @@ function App() {
   const [filename, setFilename] = useState('');
   const [videoTimer, setVideoTimer] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showLess, setShowLess] = useState(false);
   const [modalContent, setModalContent] = useState({
     enable: false,
     title: '',
@@ -68,7 +69,14 @@ function App() {
   }, [status]);
   useEffect(()=>{
     const storageData = JSON.parse(localStorage.getItem('aspizo-data'));
-    if(storageData) setData(storageData.map((item) => ({...item, axelRef: null})));
+    if(storageData) {
+      debugger;
+      setSampleDate(storageData.sampleDate);
+      setDirection(storageData.direction);
+      setLane(storageData.lane);
+      setSurveyId(storageData.surveyId);
+      setData(storageData.data.map((item) => ({...item, axelRef: null})));
+    }
   },[]);
   const updatePlayBackSpeed = (up) => {
     if(up){
@@ -122,19 +130,28 @@ function App() {
     (shouldIncrease) ? updateTimer(1) : updateTimer(-1);
   }
   const handleSave = () => {
-    localStorage.setItem('aspizo-data', JSON.stringify(data.map((item) => ({
-      AXELS: item.AXELS,
-      CLASS: item.CLASS,
-      ID: item.ID,
-      SPEED: item.SPEED,
-      TIME: item.TIME
-    }))));
     setModalContent({
       enable: true,
       title: "Data Save Confirmation",
       body: "Are you sure you want to Save All the Records",
-      footer: "Ohh yeah !!!",
-      onFooterClick: () => setModalContent({...modalContent, enable: false})
+      footer: "Save",
+      onFooterClick: () => {
+        localStorage.setItem('aspizo-data', JSON.stringify(
+          {
+            data: data.map((item) => ({
+                AXELS: item.AXELS,
+                CLASS: item.CLASS,
+                ID: item.ID,
+                SPEED: item.SPEED,
+                TIME: item.TIME
+              })),
+            sampleDate,
+            direction,
+            lane,
+            surveyId
+          }
+        ));
+        setModalContent({...modalContent, enable: false})}
     });
   }
   const handleDeleteAll = () => {
@@ -177,8 +194,11 @@ function App() {
                 Lane : <input type="text" style={{ width: '5.5vh', height: '4vh', marginLeft: '1vh' }} value={lane} onChange={(event) => setLane(event.target.value)} />
               </span> */}
             </span>
-            <Table handleRowDelete={handleRowDelete} updatePlayBackSpeed={updatePlayBackSpeed} updateBuffer={updateBuffer} timer={videoTimer} videoRef={videoRef} setTimer={setTimer} data={data} setData={setData} setStatus={setStatus} status={status} updateSeekPosition={updateSeekPosition} />
-            <Button variant="secondary" style={{ display: 'flex', marginTop: '1rem' }} onClick={handleDeleteAll}>Delete All</Button>
+            <Table showLess={showLess} handleRowDelete={handleRowDelete} updatePlayBackSpeed={updatePlayBackSpeed} updateBuffer={updateBuffer} timer={videoTimer} videoRef={videoRef} setTimer={setTimer} data={data} setData={setData} setStatus={setStatus} status={status} updateSeekPosition={updateSeekPosition} />
+            <div className="table_footer">
+              <p onClick={() => setShowLess(!showLess)}>Show {showLess ? 'More' : 'Less'}</p>
+              <Button variant="secondary" style={{ display: 'flex', marginTop: '1rem' }} onClick={handleDeleteAll}>Delete All</Button>
+            </div>
             {/* <FontAwesomeIcon style={{}} onClick={() => console.log(false)} icon={faFloppyDisk} /> */}
           </div>
           <div>
@@ -227,7 +247,7 @@ function App() {
               <Button variant="primary" onClick={handleSave}>Save</Button>
               <img src='./csv.png' style={{width: '50px'}} alt='Download as CSV' onClick={()=> setShowModal(true)}/>
             </div>
-            <div className="footer"><p>Build v1.4.0</p></div>
+            <div className="footer"><p>Build v1.6.0</p></div>
           </div>
         </div>
       {/* </>) : <Login setLoggedIn={setLoggedIn} />} */}
