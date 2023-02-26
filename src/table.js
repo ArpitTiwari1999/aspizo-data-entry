@@ -9,10 +9,7 @@ function Table(props) {
     const classRef = useRef(null);
     useEffect(() => {
         if(props.data.length) {
-            console.log('step1');
-            console.log(props.data);
             if([11, 5].includes(parseInt(props.data[props.data.length-1]['CLASS']))) {
-                console.log('step1');
                 props.data[props.data.length-1].axelRef.focus()
             }
         }
@@ -78,7 +75,19 @@ function Table(props) {
                 const currentTime = props.videoRef.getCurrentTime();
                 const min = parseInt(currentTime/60);
                 const sec = parseInt(currentTime-(min*60));
-                newElem.TIME = manageDigits(newTimer[0])+':'+manageDigits(min.toString())+':'+manageDigits(sec.toString());
+                let oldSec= parseInt(newTimer[2]);
+                let oldMin= parseInt(newTimer[1]);
+                let hour = parseInt(newTimer[0]);
+                if((sec+oldSec) > 59) {
+                    oldMin++;
+                    oldSec = oldSec-60;
+                }
+                if((min+oldMin) > 59){
+                    hour++;
+                    oldMin = oldMin-60;
+                }
+                newElem.TIME = manageDigits(hour.toString())+':'+manageDigits((min+oldMin).toString())+':'+manageDigits((sec+oldSec).toString());
+                debugger;
                 newElem.axelRef = null;
                 newElem.SPEED = getSpeed(sampleClass);
                 props.setData([...newData, newElem]);
@@ -93,7 +102,19 @@ function Table(props) {
                 const currentTime = props.videoRef.getCurrentTime();
                 const min = parseInt(currentTime/60);
                 const sec = parseInt(currentTime-(min*60));
-                props.setData([{ ID: '1', CLASS: sampleClass, AXELS: getAxels(sampleClass), TIME: newTimer[0]+':'+manageDigits(min.toString())+':'+manageDigits(sec.toString()), SPEED: getSpeed(sampleClass), axelRef: null }]);
+                let oldSec= parseInt(newTimer[2]);
+                let oldMin= parseInt(newTimer[1]);
+                let hour = parseInt(newTimer[0]);
+                if((sec+oldSec) > 59) {
+                    oldMin++;
+                    oldSec = oldSec-60;
+                }
+                if((min+oldMin) > 59){
+                    hour++;
+                    oldMin = oldMin-60;
+                }
+                const updatedTimer = manageDigits(hour.toString())+':'+manageDigits((min+oldMin).toString())+':'+manageDigits((sec+oldSec).toString());
+                props.setData([{ ID: '1', CLASS: sampleClass, AXELS: getAxels(sampleClass), TIME: updatedTimer, SPEED: getSpeed(sampleClass), axelRef: null }]);
                 // if([11, 5].includes(parseInt(sampleClass))) {
                 //     setTimeout(() => props.data[props.data.length-1].axelRef.focus(), 1000);
                 // }
@@ -112,7 +133,7 @@ function Table(props) {
     }
     const isEventKeyCodeAllowed = (keyCode) => !([37, 39, 189, 187, 38, 40, 32].includes(keyCode));
     const renderTableData = () => {
-        return props.data.map((unit) => {
+        return (props.showLess && props.data.length > 100 ? props.data.slice(-100) : props.data).map((unit) => {
            const { ID, DATE, CLASS, TIME, AXELS, SPEED } = unit;
            return (
               <tr key={ID}>
@@ -121,12 +142,9 @@ function Table(props) {
                  <td><input type="text" style={{width: '5vh'}} value={CLASS} onChange={(event) => dataUpdate(event, ID, 'CLASS')} /></td>
                  <td><input type="text" style={{width: '11.5vh'}} value={TIME} onChange={(event) => dataUpdate(event, ID, 'TIME')} /></td>
                  <td><input type="text" style={{width: '5vh'}} ref={e => unit.axelRef = e} value={AXELS} onKeyDown={(event)=> {
-                    console.log(1);
                         if(event.keyCode === 13){
-                            console.log(2);
                             classRef.current.focus();
                         }
-                        console.log(3);
                     }} onChange={(event) => dataUpdate(event, ID, 'AXELS')} /></td>
                  <td><input type="text" style={{width: '5vh'}} value={SPEED} onChange={(event) => dataUpdate(event, ID, 'SPEED')} /><FontAwesomeIcon style={{ position: 'relative', left: '4vh', cursor: 'pointer' }} onClick={() => props.handleRowDelete(ID)} icon={faTimes} /></td>
                  {/* <FontAwesomeIcon style={{}} onClick={() => console.log(false)} icon={faFloppyDisk} /> */}
