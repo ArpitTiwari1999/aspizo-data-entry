@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
@@ -6,7 +6,7 @@ function Table(props) {
     const [sampleClass, setSampleClass] = useState('');
     const [sampleAxels, setSampleAxels] = useState('');
     const [sampleSpeed, setSampleSpeed] = useState('');
-    const [classRef, setClassRef] = useState();
+    const classRef = useRef(null);
     useEffect(() => {
         if(props.data.length) {
             console.log('step1');
@@ -35,8 +35,8 @@ function Table(props) {
     const getAxels = (CLASS) => {
         const getClass = parseInt(CLASS);
         if( (parseInt(getClass) > 0 && parseInt(getClass) < 5) || (parseInt(getClass) > 5 && parseInt(getClass) < 10) || (parseInt(getClass) > 12 && parseInt(getClass) < 15) ) return '2';
-        else if (parseInt(getClass) === 5 || parseInt(getClass) === 10) return '3';
-        else if (parseInt(getClass) === 11) return '4';
+        else if (parseInt(getClass) === 10) return '3';
+        else if (parseInt(getClass) === 5 || parseInt(getClass) === 11) return '';
         else if (parseInt(getClass) === 12 ) return '13';
         else return '';
     }
@@ -121,7 +121,12 @@ function Table(props) {
                  <td><input type="text" style={{width: '5vh'}} value={CLASS} onChange={(event) => dataUpdate(event, ID, 'CLASS')} /></td>
                  <td><input type="text" style={{width: '11.5vh'}} value={TIME} onChange={(event) => dataUpdate(event, ID, 'TIME')} /></td>
                  <td><input type="text" style={{width: '5vh'}} ref={e => unit.axelRef = e} value={AXELS} onKeyDown={(event)=> {
-                        if(event.keyCode === 13) classRef.focus();
+                    console.log(1);
+                        if(event.keyCode === 13){
+                            console.log(2);
+                            classRef.current.focus();
+                        }
+                        console.log(3);
                     }} onChange={(event) => dataUpdate(event, ID, 'AXELS')} /></td>
                  <td><input type="text" style={{width: '5vh'}} value={SPEED} onChange={(event) => dataUpdate(event, ID, 'SPEED')} /><FontAwesomeIcon style={{ position: 'relative', left: '4vh', cursor: 'pointer' }} onClick={() => props.handleRowDelete(ID)} icon={faTimes} /></td>
                  {/* <FontAwesomeIcon style={{}} onClick={() => console.log(false)} icon={faFloppyDisk} /> */}
@@ -148,7 +153,7 @@ function Table(props) {
                     <tr>{renderTableHeader()}</tr>
                 </tbody>
             </table>
-            <div style={{ maxHeight: '68vh', overflow: 'auto' }}>
+            <div style={{ maxHeight: '62vh', overflow: 'auto' }}>
                 <table className='students'>
                     <tbody>
                     {renderTableData()}
